@@ -1,7 +1,3 @@
-좋아, 여기까지 내용을 기반으로, **AI-startup-evaluation** 프로젝트용 GitHub 리드미 초안 ✍️을 아래처럼 정리할게.
-
----
-
 # 🚀 AI-startup-evaluation
 
 AI 스타트업 투자 판단을 지원하는 멀티에이전트 시스템입니다.  
