@@ -8,16 +8,56 @@ AI 스타트업 투자 판단을 지원하는 멀티에이전트 시스템입니
 ## 📂 프로젝트 구조
 
 ```bash
-AI-startup-evaluation/
- ├── config.py # 전역 설정
- ├── app.py # FastAPI 서버 실행
- ├── agents/ # 에이전트별 작업 모듈
- ├── models/ # LLM 호출 및 파싱 모듈
- ├── routes/ # API 라우팅
- ├── vector_db/ # VectorDB 관련 기능
- ├── utils/ # 공통 유틸리티 함수
- ├── .env # 환경 변수 파일
- └── requirements.txt # 라이브러리 목록
+project_root/
+├── src/
+│   ├── common/                      # 공통 모델·유틸
+│   │   ├── __init__.py
+│   │   ├── models.py                # BaseModel 정의 (FundingRound, MarketMetrics 등)
+│   │   ├── schema.py                # StateGraph 스키마 타입 (pydantic BaseModel)
+│   │   └── utils.py                 # HTTP 요청, RAG 처리, 로깅 등
+│   │
+│   ├── agents/                      # 에이전트별 구현
+│   │   ├── startup_search/          # 🔍 스타트업 탐색 에이전트
+│   │   │   ├── __init__.py
+│   │   │   ├── config.py            # FIELDS_TO_EXTRACT, 검색 파라미터 정의
+│   │   │   ├── state_models.py      # 입력/출력 BaseModel (Input, Output 정의)
+│   │   │   ├── graph_builder.py     # StateGraph 빌더(노드·엣지 정의)
+│   │   │   └── executor.py          # graph.invoke 호출부(main 함수)
+│   │   │
+│   │   ├── tech_summary/            # 🗜️ 기술 요약 에이전트
+│   │   │   ├── __init__.py
+│   │   │   ├── state_models.py
+│   │   │   ├── graph_builder.py
+│   │   │   └── executor.py
+│   │   │
+│   │   ├── market_evaluation/       # 📊 시장성 평가 에이전트
+│   │   │   ├── __init__.py
+│   │   │   ├── state_models.py
+│   │   │   ├── graph_builder.py
+│   │   │   └── executor.py
+│   │   │
+│   │   ├── founder_evaluation/      # 👤 창업자 평가 에이전트
+│   │   │   └── ...
+│   │   │
+│   │   ├── competitor_comparison/   # 🥊 경쟁사 비교 에이전트
+│   │   │   └── ...
+│   │   │
+│   │   ├── investment_decision/     # 🧮 투자 판단 에이전트
+│   │   │   └── ...
+│   │   │
+│   │   └── report_generation/       # 📝 보고서 생성 에이전트
+│   │       └── ...
+│   │
+│   └── main.py                      # 전체 파이프라인 orchestration
+│
+├── tests/                           # 유닛테스트
+│   └── agents/
+│       └── startup_search/
+│           └── test_graph.py
+│
+├── requirements.txt
+└── README.md
+
 ```
 
 ---
