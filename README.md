@@ -114,7 +114,6 @@ uvicorn app:app --reload --host 0.0.0.0 --port 8001
 | 🧮 투자 판단 에이전트 | 최종 투자 여부 결정 |✅ | 스코어 종합 및 리스크 반영 |
 | 📝 보고서 생성 에이전트 | 보고서 자동 작성 | ❌ | 요약 결과 종합 서술 |
 
-![ChatGPT Image 2025년 4월 30일 오후 04_09_03](https://github.com/user-attachments/assets/81e48d6d-8ae4-4afc-aa14-c2903dfe1cd1)
 
 ---
 
