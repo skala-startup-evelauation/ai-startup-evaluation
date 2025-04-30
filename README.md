@@ -296,6 +296,10 @@ JSON으로 파싱
 - 기업 수가 50개 이상이면 30~35번째 기업부터 추출 (실행 속도 제한)
 - AI 관련 기업이 3~5개 발견되면 탐색 종료
 
+### outState 형태
+<img width="642" alt="image" src="https://github.com/user-attachments/assets/aeda8531-ea36-47f0-95a6-3e7a85cb1121" />
+
+
 
 # 3. 기술 요약 에이전트
 
