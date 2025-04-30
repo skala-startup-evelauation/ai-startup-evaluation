@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from browser_use.agent.service import Agent
 from browser_use.browser.browser import Browser, BrowserConfig
-from browser_use.browser.context import BrowserContextConfig
+import json
 
 load_dotenv()
 
@@ -16,7 +16,7 @@ EXCEL_PATH = "./thevc_invest_list.xlsx"
 FIELDS_TO_EXTRACT = [
     "기업 이름", "설립연월", "상세정보", "대표자 정보", "경쟁사 리스트", "상장, 비상장 여부",
     "투자 라운드", "투자 유치 건수", "투자 금액", "임직원수", "회사 홈페이지",
-    "제품/서비스 목록", "특허 개수", "등기 임원 수"
+    "제품/서비스 목록", "특허 개수", "등기 임원 수", "AI_관련기업여부", "AI_관련성_설명"
 ]
 
 def get_company_links_by_category(category_name: str) -> List[Dict]:
@@ -59,54 +59,97 @@ Extract and return the following details as JSON:
 - "제품/서비스 목록"
 - "특허 개수"
 - "등기 임원 수"
+- "AI_관련기업여부"
+- "AI_관련성_설명"
 
 **Instructions:**
-- Scroll as needed to find all information.
 - For "제품/서비스 목록" and "경쟁사 리스트", return as a list.
 - For "상세정보" , return 회사가 어떤 상품을 메인으로 일을 진행하는지 입니다.
 - If any field is missing, return "No data".
-- Output as JSON with the above keys.
+- For AI_관련기업여부, return only True or False and if it is unknown then it is False.
+- Output as JSON with the above keys.e
+-use minimum step.
 """
 
 async def fetch_company_info(company: Dict, browser: Browser, llm: ChatOpenAI) -> Dict:
+    # 프롬프트에 AI 관련성 판단 요청 추가
     prompt = build_thevc_prompt(company["company"], company["link"])
     agent = Agent(task=prompt, llm=llm, browser=browser)
     history = await agent.run()
     result = history.final_result()
-    print(f"[{company['company']}] {result}")
-    return {company["company"]: result}
+    
+    # GPT가 판단한 AI 관련 기업 여부로 필터링
+    try:
+        print(f"[{company['company']}] result 원본: {result}")        
+        result_dict = json.loads(result)
+        is_ai_company = result_dict.get("AI_관련기업여부", False)
+        if not is_ai_company:
+            print(f"[{company['company']}] AI 관련 아님: {result_dict.get('AI_관련성_설명', '')}")
+            return {}
+        print(f"[{company['company']}] {result}")
+        return {company["company"]: result}
+    except Exception as e:
+        print(f"[{company['company']}] 결과 파싱 오류: {e}")
+        return {}
 
 async def process_companies_in_batches(companies: List[Dict], batch_size: int = 10):
     llm = ChatOpenAI(model="gpt-4o")
     results = {}
 
-    # 기업 수가 40개 이상이면 중간 10개만 추출
-    if len(companies) >= 40:
-        companies = companies[20:30]
+    # 기업 수가 40개 이상이면 30이상부터만 추출
+    if len(companies) >= 50:
+        companies = companies[30:35]
+    ai_company_count = 0
+    processed_companies = []
 
     for i in range(0, len(companies), batch_size):
+        if ai_company_count >= 3:  # 3개의 AI 기업을 찾으면 중단
+            break
+            
         batch = companies[i:i+batch_size]
-        browsers = [
-            Browser(
+        browser = Browser(
                 config=BrowserConfig(
                     disable_security=False,
                     headless=False,
-                    keep_alive=True,
+                    keep_alive=False,
                     chrome_instance_path='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',  # macOS path
-                    new_context_config=BrowserContextConfig(save_recording_path='./tmp/recordings')
-                )
+                    # new_context_config=BrowserContextConfig(save_recording_path='./tmp/recordings')
+                ),
+                # browser_binary_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
             )
-            for _ in batch
-        ]
+        # browsers = [
+        #     Browser(
+        #         config=BrowserConfig(
+        #             disable_security=False,
+        #             headless=False,
+        #             keep_alive=True,
+        #             chrome_instance_path='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        #         )
+        #     )
+        #     for _ in batch
+        # ]
+        # tasks = [
+        #     fetch_company_info(company, browser, llm)
+        #     for company, browser in zip(batch, browsers)
+        # ]
         tasks = [
             fetch_company_info(company, browser, llm)
-            for company, browser in zip(batch, browsers)
+            for company in batch
         ]
         batch_results = await asyncio.gather(*tasks)
-        for browser in browsers:
-            await browser.close()
+        # for browser in browsers:
+        #     print("browser close")
+        #     await browser.close()
+        print("browser close")
+        await browser.close()
+
         for res in batch_results:
-            results.update(res)
+            if res:  # 빈 딕셔너리가 아닌 경우(AI 기업인 경우)만 처리
+                results.update(res)
+                ai_company_count += 1
+                if ai_company_count >= 5:
+                    break
+                    
     return results
 
 def main(category_name: str):
