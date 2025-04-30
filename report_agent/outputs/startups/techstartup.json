@@ -1,0 +1,62 @@
+{
+  "name": "테크스타트업",
+  "founded_at": "2020-01-15",
+  "description": "AI 기반 핀테크 솔루션 제공 기업",
+  "founder": {
+    "name": "홍길동",
+    "education": "서울대학교 컴퓨터공학 박사",
+    "career": "금융기관 AI 연구소 10년 근무, 핀테크 스타트업 CTO 3년 경력",
+    "risk_factors": "핀테크 CEO 경험 부족",
+    "key_strengths": "기술 전문성, 금융 산업 이해도"
+  },
+  "competitors": [
+    "핀테크 대기업 A",
+    "기술 스타트업 B",
+    "해외 핀테크 C"
+  ],
+  "is_listed": false,
+  "funding_rounds": [
+    {
+      "date": "2020-06-01",
+      "amount": 5.0,
+      "investors": [
+        "벤처캐피탈A",
+        "엔젤투자자B"
+      ],
+      "round_type": "Seed"
+    },
+    {
+      "date": "2021-09-01",
+      "amount": 30.0,
+      "investors": [
+        "벤처캐피탈C",
+        "벤처캐피탈D"
+      ],
+      "round_type": "Series A"
+    }
+  ],
+  "total_investments": 35,
+  "employee_count": 25,
+  "website": "https://techstartup.com",
+  "products_services": [
+    "AI 신용평가 시스템",
+    "금융 데이터 분석 플랫폼"
+  ],
+  "patent_count": 3,
+  "board_member_count": 5,
+  "financials": {
+    "burn_rate_usd_per_month": 30000,
+    "runway_months": 18,
+    "last_3y_revenue": [
+      0,
+      100000,
+      500000
+    ],
+    "dau": 5000,
+    "retention_rate": 0.75,
+    "arr_usd": 2000000,
+    "mrr_usd": 160000,
+    "cac_usd": 200,
+    "ltv_usd": 1500
+  }
+}
