@@ -1,14 +1,8 @@
-# investment_agent/agents/founder_eval_agent.py
-
 import os
-import json
-from typing import Optional, List, Dict
-from pathlib import Path
+from typing import Optional, Dict, Any
 from openai import OpenAI
-from dotenv import load_dotenv  # dotenv 먼저 import
-from startup import FounderInfo
-
-
+from dotenv import load_dotenv
+from investment_agent.models.startup import FounderInfo, Startup
 
 # 1. 환경 변수 로딩
 load_dotenv()
@@ -31,14 +25,22 @@ def ask_gpt(question: str, system_msg: str = "아래 질문에 대해 한국어�
     )
     return response.choices[0].message.content.strip()
 
+# 3. LangGraph용 evaluate 함수
+def evaluate_founder_node(inputs: Dict[str, Any]) -> Dict[str, Any]:
+    startup: Startup = inputs["startup"]
+    founder_name: Optional[str] = startup.founder.name if startup.founder else None
+    startup_name: str = startup.name
 
-def evaluate_founder(startup_name: str, founder_name: Optional[str]) -> FounderInfo:
-    if founder_name is None:
+# 단일 실행용 evaluate 함수
+# def evaluate_founder(startup_name: str, founder_name: Optional[str]) -> FounderInfo:
+#     if founder_name is None:
+#         founder_name = ask_gpt(f"{startup_name}의 창업자 이름은 누구인가요?")
+
+    if not founder_name:
         founder_name = ask_gpt(f"{startup_name}의 창업자 이름은 누구인가요?")
 
     print(f"{startup_name} 창업자 '{founder_name}'에 대한 정보 수집 중...")
 
-    # 질문 목록
     questions = {
         "education": f"{startup_name}의 창업자 {founder_name}의 최종 학력은 무엇이며, 어떤 학교에서 어떤 전공을 공부했나요?",
         "career": f"{startup_name}의 창업자 {founder_name}는 창업 전 어떤 회사에서 어떤 직책으로 근무했으며, 각 경력의 기간과 주요 성과는 무엇인가요?",
@@ -46,14 +48,13 @@ def evaluate_founder(startup_name: str, founder_name: Optional[str]) -> FounderI
         "key_strengths": f"{startup_name}의 대표 {founder_name}의 기술적/사업적 강점과 리더십이나 글로벌 진출 능력 등 두드러진 역량을 알려주세요."
     }
 
-    # GPT 응답 수집
     responses = {}
     for key, question in questions.items():
-        if key not in responses:  # 이미 저장된 key는 건너뛰기 (중복 방지)
-            print(f"→ GPT 질문: {question}")
-            responses[key] = ask_gpt(question)
+        print(f"→ GPT 질문: {question}")
+        responses[key] = ask_gpt(question)
 
-    return FounderInfo(
+    # FounderInfo 생성 및 Startup에 주입
+    startup.founder = FounderInfo(
         name=founder_name,
         education=responses["education"],
         career=responses["career"],
@@ -61,3 +62,4 @@ def evaluate_founder(startup_name: str, founder_name: Optional[str]) -> FounderI
         key_strengths=responses["key_strengths"]
     )
 
+    return {"startup": startup}
