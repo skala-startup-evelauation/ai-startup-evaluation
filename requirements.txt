@@ -1,1 +1,5 @@
 browser-use
+langchain_openai
+python-dotenv==1.1.0
+chromadb==1.0.0
+openpyxl
