@@ -1,0 +1,6 @@
+langchain
+python-dotenv
+openai
+chromadb
+sentence-transformers
+PyMuPDF
