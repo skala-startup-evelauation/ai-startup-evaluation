@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 from typing import List, Dict, Any
 from pathlib import Path
@@ -94,10 +95,20 @@ class InvestmentJudgmentAgent:
         # score_str = self.score_chain.run(startup_info=info_json)
         print(info_json)
         score_str = self.score_chain.run(startup_info=info_json)
-        print("==========================================")
-        print(score_str)
         
-        scores = json.loads(score_str)
+        raw = score_str
+        # 2) 코드 펜스 제거
+        #    ```json\n{...}\n```  형태라면 fence와 언어태그를 제거
+        if raw.startswith("```"):
+            # 첫 번째 개행 뒤부터, 마지막 ``` 직전까지
+            raw = raw.split("\n", 1)[1].rsplit("\n```", 1)[0]
+
+        # 3) 순수 JSON 객체만 추출 (안에 다른 문구가 섞여 있으면)
+        m = re.search(r"\{.*\}", raw, re.DOTALL)
+        if m:
+            raw = m.group(0)
+        
+        scores = json.loads(raw)
 
         total = sum(scores[k] * self.weights[k] for k in self.weights)
 
