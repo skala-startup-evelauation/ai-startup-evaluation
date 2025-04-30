@@ -362,3 +362,14 @@ ParagraphStyle로 한글 처리
 
 ---
 
+### 컨트리뷰터
+노건표 : Start-Up Search Agent design
+김용준 : PDF Generator Agent Design
+이승민: Investment judgement Agent design
+전성현 : Founder Information Review
+이소미 : Market Evaluation Agent Design
+
+
+
+
+
