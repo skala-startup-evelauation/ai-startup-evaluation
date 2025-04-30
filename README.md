@@ -93,15 +93,17 @@ uvicorn app:app --reload --host 0.0.0.0 --port 8001
 
 ---
 
-# 📋 목차
+# 목차
 
 1. [Agent 정의](#-agent-정의)
 2. [RAG 문서 정의](#-rag-문서-정의)
 3. [전체 흐름 요약](#-전체-흐름-요약)
+4. [시장성 평가 에이전트](#-시장성-평가-에이전트)
+5. [컨트리뷰터](#-컨트리뷰터)
 
 ---
 
-## 🧠 Agent 정의
+## Agent 정의
 
 | **에이전트** | task | **벡터디비여부** | **내용** |
 | :--- | :--- | :--- | :--- |
@@ -142,7 +144,7 @@ uvicorn app:app --reload --host 0.0.0.0 --port 8001
 ```
 
 ---
-## 1. 📊 시장성 평가 에이전트
+## 1. 시장성 평가 에이전트
 
 (**"지표 추출형 Structured RAG" 사용**)
 
@@ -184,12 +186,12 @@ PDF 로드 → 섹션 추출 → GPT 요약 → 청킹 → 벡터 DB 저장 → 
    - 문서 임베딩 생성
    - Chroma DB에 영구 저장
 
-✅ **RAG 핵심**:
+**RAG 핵심**:
 
 - 비정형 리포트에서 **정형지표 추출** (Entity Extraction + Parsing)
 
 
-# 2. 🔍 스타트업 탐색 에이전트
+# 2. 스타트업 탐색 에이전트
 
 (**"멀티 소스 (thevc.kr 공시 정보 활용)**)
 
@@ -207,7 +209,7 @@ PDF 로드 → 섹션 추출 → GPT 요약 → 청킹 → 벡터 DB 저장 → 
     - sector 키워드 관련성 높은 스타트업 최소 20개 수집
     - 투자금 기준 필터 → 조건 만족 스타트업 5~10개로 좁힘 (다단계 loop)
 
-1. ✅ get_company_links_by_category()
+1. get_company_links_by_category()
 ./thevc_invest_list.xlsx 파일의 1행(헤더)에서 sector 키워드에 해당하는 열을 찾음
 
 해당 열에서 기업 이름(B열)과 하이퍼링크(URL)을 추출
@@ -217,7 +219,7 @@ PDF 로드 → 섹션 추출 → GPT 요약 → 청킹 → 벡터 DB 저장 → 
     {"company": "푸드테크코리아", "link": "https://thevc.kr/FoodTechKorea"},
     ...
 
-2. ✅ build_thevc_prompt(company_name, link)
+2. build_thevc_prompt(company_name, link)
 THE VC 기업 상세 페이지를 읽고 LLM이 추출할 JSON 필드를 명시
 
 명세된 필드 리스트:
@@ -227,8 +229,8 @@ THE VC 기업 상세 페이지를 읽고 LLM이 추출할 JSON 필드를 명시
     "투자 라운드", "투자 유치 건수", "투자 금액", "임직원수", "회사 홈페이지",
     "제품/서비스 목록", "특허 개수", "등기 임원 수", "AI_관련기업여부", "AI_관련성_설명"
 ]
-### 🌐 웹 탐색 방식 (Browser-Use 기반)
-✅ browser_use를 이용한 실행 방식
+### 웹 탐색 방식 (Browser-Use 기반)
+browser_use를 이용한 실행 방식
 Agent 생성
 
 
@@ -247,14 +249,14 @@ JSON으로 파싱
 
 기업 이름 → StartupSearchOutput 모델로 매핑
 
-### 🔁 기타 세부처리
+### 기타 세부처리
 
 - 한 번에 5개씩 브라우저로 병렬 탐색 (batch)
 - 기업 수가 50개 이상이면 30~35번째 기업부터 추출 (실행 속도 제한)
 - AI 관련 기업이 3~5개 발견되면 탐색 종료
 
 
-# 3. 🗜️기술 요약 에이전트
+# 3. 기술 요약 에이전트
 
 (**"다큐먼트 매칭 + 집중 요약형 RAG" 사용**)
 
@@ -274,7 +276,7 @@ JSON으로 파싱
     - core_technology만 추출
     - strengths/weaknesses는 별도로 지시문(Prompt) 내 삽입해 강제 추출
 
-# 4. 👤 창업자 평가 에이전트
+# 4. 창업자 평가 에이전트
 
 (**"Background Summarization RAG" 사용**)
 
@@ -322,7 +324,7 @@ JSON으로 파싱
 
 ---
 
-# 보고서 생성 에이전트 심화
+# 6. 보고서 생성 에이전트 심화
 
 - 스타트업별 기본정보, 기술력, 시장성, 경쟁력, 창업자 평가 종합
 - 표와 자연어 설명을 결합한 **읽기 좋은 투자 보고서** 자동 생성
@@ -358,7 +360,7 @@ ParagraphStyle로 한글 처리
 
 ---
 
-### 컨트리뷰터
+# 컨트리뷰터
 
 - 노건표 : Start-Up Search Agent design
 - 김용준 : PDF Generator Agent Design
