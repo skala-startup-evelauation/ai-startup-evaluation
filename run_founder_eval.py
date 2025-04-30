@@ -1,17 +1,22 @@
-# run_founder_eval_langgraph.py
-
 from investment_agent.agents.founder_eval_agent import evaluate_founder_node
 from investment_agent.models.startup import Startup, FounderInfo
-from langgraph.graph import StateGraph
 
-# 1. Startup 객체 정의
+# ▶️ 창업자 이름을 알고 있다면 여기 입력
+manual_founder_name = "김봉진"  # 또는 None
+
 startup = Startup(
     name="배달의민족",
-    founder=None,
+    founder=FounderInfo(
+        name=manual_founder_name,
+        education=None,
+        career=None,
+        risk_factors=None,
+        key_strengths=None
+    ) if manual_founder_name else None,
     founded_at="2010-03-01",
     description="음식 배달 주문 플랫폼 서비스로 국내 대표 O2O 스타트업",
     is_listed=False,
-    total_investments=250000000000,
+    total_investments=250000000000,  # 약 2,500억 원
     employee_count=1000,
     website="https://www.baemin.com",
     patent_count=10,
@@ -34,19 +39,14 @@ startup = Startup(
     }
 )
 
-# 2. LangGraph 워크플로우 구성
-builder = StateGraph()
-builder.add_node("founder_eval", evaluate_founder_node)
-builder.set_entry_point("founder_eval")
-graph = builder.compile()
+# ▶️ LangGraph 함수 실행
+outputs = evaluate_founder_node({"startup": startup})
 
-# 3. 실행
-result = graph.invoke({"startup": startup})
+# ▶️ 결과 출력
+result: Startup = outputs["startup"]
+founder: FounderInfo = result.founder
 
-# 4. 결과 출력
-founder: FounderInfo = result["startup"].founder
-
-print("\n📌 LangGraph 실행 결과:")
+print("\n✅ 최종 결과:")
 print(f"창업자 이름: {founder.name}")
 print(f"학력: {founder.education}")
 print(f"경력: {founder.career}")
