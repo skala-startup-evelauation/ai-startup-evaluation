@@ -13,7 +13,7 @@ if api_key is None:
 
 client = OpenAI(api_key=api_key)
 
-# 2. 🔍 MOCK: 백그라운드 정보 검색 함수 (벡터 DB 대체용)
+# 2. MOCK: 백그라운드 정보 검색 함수 (벡터 DB 대체용)
 def search_background_info(startup_name: str) -> List[str]:
     # TODO: 실제 RAG 벡터 검색으로 대체 가능
     return [
@@ -22,7 +22,7 @@ def search_background_info(startup_name: str) -> List[str]:
         f"과거 실패한 스타트업 경험이 있었으나, 현재 창업에서는 안정적 성장세를 보이고 있습니다."
     ]
 
-# 3. 🔄 백그라운드 요약 생성
+# 3. 백그라운드 요약 생성
 def generate_background_summary(docs: List[str]) -> str:
     joined_context = "\n".join(docs)
     system_msg = "다음 배경 정보들을 간결하게 요약해 주세요. 한국어로 3~4문장 이내로 작성해주세요."
@@ -51,7 +51,7 @@ def evaluate_founder_node(inputs: Dict[str, Any]) -> Dict[str, Any]:
 #     if founder_name is None:
 #         founder_name = ask_gpt(f"{startup_name}의 창업자 이름은 누구인가요?")
 
-    # 🔍 백그라운드 문서 검색 및 요약
+    # 백그라운드 문서 검색 및 요약
     background_docs = search_background_info(startup_name)
     background_summary = generate_background_summary(background_docs)
 
