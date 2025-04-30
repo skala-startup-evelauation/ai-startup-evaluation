@@ -58,7 +58,7 @@ project_root/
 ```
 
 ### 전체 Agent 흐름 다이어그램 (with 분기 & Loop)
-'''
+'''bash
 [📊 시장성 평가 에이전트] 
       |
       V
